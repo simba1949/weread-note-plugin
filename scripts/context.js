@@ -9,8 +9,21 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         const result = fetchBookNoteFun();
         sendResponse(result); // 确保 response 数据被正确返回
         return true; // 保持异步响应
+    } else if (request.action === "fetchBookNameFunAction") {
+        const result = fetchBookNameFun();
+        sendResponse(result); // 确保 response 数据被正确返回
+        return true;
     }
 });
+
+/**
+ * 获取书籍名称
+ * @returns 书籍名称
+ */
+window.fetchBookNameFun = function fetchBookNameFun() {
+    const title = document.getElementsByClassName("wr_reader_note_panel_header_cell_info_title"); // <div data-v-31681d46 class="wr_reader_note_panel_header_cell_info_title">
+    return title[0].textContent;
+}
 
 /**
  * 获取书籍目录
@@ -139,7 +152,7 @@ window.fetchBookNoteFun = function fetchBookNoteFun() {
                             const className = cellContent.className;
                             if ("wr_reader_note_panel_item_cell_content_text" === className) { // <div data-v-451b641e class="wr_reader_note_panel_item_cell_content_text">
                                 let realContent = cellContent.textContent;
-                                realContent = realContent.replaceAll("[插图]", " ");
+                                realContent = realContent.replaceAll("[插图]\n", "").replaceAll("[插图]", "");
                                 if (null != realContent && "" !== realContent) {
                                     noteObj.contents.push(realContent); // 笔记内容
                                 }

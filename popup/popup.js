@@ -1,11 +1,12 @@
+const fetchBookNameElement = document.getElementById('fetchBookNameId');
 const exportBookCatalogElement = document.getElementById('exportBookCatalogId');
 const exportBookNotesElement = document.getElementById('exportBookNotesId');
 
-// 导出书籍目录
-exportBookCatalogElement.addEventListener('click', async () => {
+//  获取书籍名称
+fetchBookNameElement.addEventListener('click', async () => {
     try {
         // 获取当前激活 Tab
-        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        const [tab] = await chrome.tabs.query({active: true, currentWindow: true});
         if (tab.length < 1) {
             console.log('未获取到标签页');
             return;
@@ -13,9 +14,47 @@ exportBookCatalogElement.addEventListener('click', async () => {
 
         // 先注入内容脚本
         await chrome.scripting.executeScript({
-            target: { tabId: tab.id },
+            target: {tabId: tab.id},
             files: ['scripts/context.js']
         });
+
+        // 获取书籍名称（通过 background.js 触 发content.js 函数）
+        const bookName = await chrome.runtime.sendMessage({
+            action: "fetchBookNameAction",
+            tabId: tab.id
+        });
+        console.log("获取到的书籍名称：", bookName)
+
+        // 弹出书名
+        alert(bookName);
+    } catch (error) {
+        console.error('读取失败:', error);
+    }
+});
+
+
+// 导出书籍目录
+exportBookCatalogElement.addEventListener('click', async () => {
+    try {
+        // 获取当前激活 Tab
+        const [tab] = await chrome.tabs.query({active: true, currentWindow: true});
+        if (tab.length < 1) {
+            console.log('未获取到标签页');
+            return;
+        }
+
+        // 先注入内容脚本
+        await chrome.scripting.executeScript({
+            target: {tabId: tab.id},
+            files: ['scripts/context.js']
+        });
+
+        // 获取书籍名称（通过 background.js 触 发content.js 函数）
+        const bookName = await chrome.runtime.sendMessage({
+            action: "fetchBookNameAction",
+            tabId: tab.id
+        });
+        console.log("获取到的书籍名称：", bookName)
 
         // 获取书籍目录集合（通过 background.js 触 发content.js 函数）
         console.log("开始读取目录")
@@ -25,7 +64,7 @@ exportBookCatalogElement.addEventListener('click', async () => {
         });
         console.log("读取目录结束，读取到的结果：", catalogs)
 
-        exportBookCatalogsFun(catalogs);
+        exportBookCatalogsFun("《" + bookName + "》目录", catalogs);
     } catch (error) {
         console.error('读取失败:', error);
     }
@@ -35,7 +74,7 @@ exportBookCatalogElement.addEventListener('click', async () => {
 exportBookNotesElement.addEventListener("click", async () => {
     try {
         // 获取标签页
-        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        const [tab] = await chrome.tabs.query({active: true, currentWindow: true});
         if (tab.length < 1) {
             console.log('未获取到标签页');
             return;
@@ -43,9 +82,16 @@ exportBookNotesElement.addEventListener("click", async () => {
 
         // 先注入内容脚本
         await chrome.scripting.executeScript({
-            target: { tabId: tab.id },
+            target: {tabId: tab.id},
             files: ['scripts/context.js']
         });
+
+        // 获取书籍名称（通过 background.js 触 发content.js 函数）
+        const bookName = await chrome.runtime.sendMessage({
+            action: "fetchBookNameAction",
+            tabId: tab.id
+        });
+        console.log("获取到的书籍名称：", bookName)
 
         // 获取书籍目录集合（通过 background.js 触 发content.js 函数）
         console.log("开始读取目录")
@@ -62,34 +108,33 @@ exportBookNotesElement.addEventListener("click", async () => {
         });
         console.log("读取笔记结束，读取到的结果：", notes)
 
-        debugger;
-        exportNotesFun(catalogs, notes);
+        exportNotesFun("《" + bookName + "》书摘", catalogs, notes);
     } catch (error) {
         console.error('读取失败:', error);
     }
 })
 
 // 导出书籍目录
-function exportBookCatalogsFun(catalogs) {
+function exportBookCatalogsFun(bookName, catalogs) {
     console.log("构建目录开始")
     const text = buildBookCatalogTextFun(catalogs);
     console.log(text);
     console.log("构建目录结束")
 
     console.log("导出开始");
-    exportTextFun(text);
+    exportTextFun(bookName, text);
     console.log("导出结束")
 }
 
 // 导出书籍目录和笔记
-function exportNotesFun(catalogs, notes) {
+function exportNotesFun(noteName, catalogs, notes) {
     console.log("构建目录和笔记开始")
     const text = buildBookNotesTextFun(catalogs, notes);
     console.log(text);
     console.log("构建目录和笔记结束")
 
     console.log("导出开始");
-    exportTextFun(text);
+    exportTextFun(noteName, text);
     console.log("导出结束")
 }
 
@@ -182,15 +227,16 @@ function buildBookNotesTextFun(catalogs, notes) {
 
 /**
  * 导出文本
+ * @param noteName
  * @param text
  */
-function exportTextFun(text) {
-    const blob = new Blob([text], { type: 'text/plain' }); // 创建文本 Blob
+function exportTextFun(noteName, text) {
+    const blob = new Blob([text], {type: 'text/plain'}); // 创建文本 Blob
     const url = URL.createObjectURL(blob); // 定义 url
 
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'book_catalog.md'; // 可以根据需要改文件名
+    a.download = noteName + '.md'; // 可以根据需要改文件名
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
