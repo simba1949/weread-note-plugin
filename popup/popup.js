@@ -19,16 +19,25 @@ fetchBookNameElement.addEventListener('click', async () => {
         });
 
         // 获取书籍名称（通过 background.js 触 发content.js 函数）
-        const bookName = await chrome.runtime.sendMessage({
-            action: "fetchBookNameAction",
-            tabId: tab.id
-        });
+        const bookName = await chrome.runtime.sendMessage(
+            {
+                action: "fetchBookNameAction",
+                tabId: tab.id
+            },
+            (response) => {
+                if (chrome.runtime.lastError) {
+                    // 可在此记录日志或触发用户提示
+                } else {
+
+                }
+            });
+
         console.log("获取到的书籍名称：", bookName)
 
-        // 弹出书名
-        alert(bookName);
+        if (null != bookName) {
+            alert(bookName);
+        }
     } catch (error) {
-        console.error('读取失败:', error);
     }
 });
 
@@ -66,7 +75,6 @@ exportBookCatalogElement.addEventListener('click', async () => {
 
         exportBookCatalogsFun("《" + bookName + "》目录", catalogs);
     } catch (error) {
-        console.error('读取失败:', error);
     }
 });
 
@@ -110,7 +118,6 @@ exportBookNotesElement.addEventListener("click", async () => {
 
         exportNotesFun("《" + bookName + "》书摘", catalogs, notes);
     } catch (error) {
-        console.error('读取失败:', error);
     }
 })
 
