@@ -1,0 +1,1 @@
+console.log("扩展页面：bakcground.js");

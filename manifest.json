@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "微信笔记助手",
+  "description": "基于书籍标题的目录结构导出微信读书笔记",
+  "version": "0.0.0.1",
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": "images/icon.png"
+  },
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "downloads"
+  ],
+  "background": {
+    "service_worker": "scripts/background.js"
+  },
+  "content_scripts": [],
+  "host_permissions": [
+    "https://weread.qq.com/*"
+  ]
+}
