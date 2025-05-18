@@ -3,19 +3,30 @@
   "name": "微信笔记助手",
   "description": "基于书籍标题的目录结构导出微信读书笔记",
   "version": "0.0.0.1",
+  "permissions": [
+    "activeTab",
+    "tabs",
+    "scripting",
+    "downloads"
+  ],
   "action": {
     "default_popup": "popup/popup.html",
     "default_icon": "images/icon.png"
   },
-  "permissions": [
-    "activeTab",
-    "scripting",
-    "downloads"
-  ],
   "background": {
-    "service_worker": "scripts/background.js"
+    "service_worker": "scripts/background.js",
+    "type": "module"
   },
-  "content_scripts": [],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://weread.qq.com/*"
+      ],
+      "js": [
+        "scripts/context.js"
+      ]
+    }
+  ],
   "host_permissions": [
     "https://weread.qq.com/*"
   ]
