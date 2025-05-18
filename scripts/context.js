@@ -22,7 +22,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
  */
 window.fetchBookNameFun = function fetchBookNameFun() {
     const title = document.getElementsByClassName("wr_reader_note_panel_header_cell_info_title"); // <div data-v-31681d46 class="wr_reader_note_panel_header_cell_info_title">
-    return title[0].textContent;
+    if (null != title && title.length > 0) {
+        return title[0].textContent;
+    }
 }
 
 /**

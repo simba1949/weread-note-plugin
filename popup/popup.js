@@ -64,6 +64,9 @@ exportBookCatalogElement.addEventListener('click', async () => {
             tabId: tab.id
         });
         console.log("获取到的书籍名称：", bookName)
+        if (null == bookName) {
+            return;
+        }
 
         // 获取书籍目录集合（通过 background.js 触 发content.js 函数）
         console.log("开始读取目录")
@@ -100,6 +103,9 @@ exportBookNotesElement.addEventListener("click", async () => {
             tabId: tab.id
         });
         console.log("获取到的书籍名称：", bookName)
+        if (null == bookName) {
+            return;
+        }
 
         // 获取书籍目录集合（通过 background.js 触 发content.js 函数）
         console.log("开始读取目录")
