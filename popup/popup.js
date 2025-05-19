@@ -23,13 +23,6 @@ fetchBookNameElement.addEventListener('click', async () => {
             {
                 action: "fetchBookNameAction",
                 tabId: tab.id
-            },
-            (response) => {
-                if (chrome.runtime.lastError) {
-                    // 可在此记录日志或触发用户提示
-                } else {
-
-                }
             });
 
         console.log("获取到的书籍名称：", bookName)
@@ -40,7 +33,6 @@ fetchBookNameElement.addEventListener('click', async () => {
     } catch (error) {
     }
 });
-
 
 // 导出书籍目录
 exportBookCatalogElement.addEventListener('click', async () => {
@@ -122,7 +114,9 @@ exportBookNotesElement.addEventListener("click", async () => {
         });
         console.log("读取笔记结束，读取到的结果：", notes)
 
-        exportNotesFun("《" + bookName + "》书摘", catalogs, notes);
+        const exportNoteType = document.getElementById("exportFormatSelect").value
+
+        exportNotesFun("《" + bookName + "》书摘", catalogs, notes, exportNoteType);
     } catch (error) {
     }
 })
@@ -140,9 +134,9 @@ function exportBookCatalogsFun(bookName, catalogs) {
 }
 
 // 导出书籍目录和笔记
-function exportNotesFun(noteName, catalogs, notes) {
+function exportNotesFun(noteName, catalogs, notes, exportNoteType) {
     console.log("构建目录和笔记开始")
-    const text = buildBookNotesTextFun(catalogs, notes);
+    const text = buildBookNotesTextFun(catalogs, notes, exportNoteType);
     console.log(text);
     console.log("构建目录和笔记结束")
 
@@ -189,53 +183,95 @@ function buildBookCatalogTextFun(catalogs) {
  * 构建书籍目录和笔记文本
  * @param catalogs
  * @param notes
+ * @param exportNoteType
  * @returns {string}
  */
-function buildBookNotesTextFun(catalogs, notes) {
+function buildBookNotesTextFun(catalogs, notes, exportNoteType) {
     if (null == catalogs || catalogs.length < 1 || null == notes || notes.length < 1) {
         return;
     }
 
+    // 笔记目录名称和笔记内容映射
     let catalogNameMapNote = new Map;
     notes.forEach(note => catalogNameMapNote.set(note.catalogName, note));
 
     let result = "";
-    let levelStr = "";
     for (const catalog of catalogs) {
-        if ("1" === catalog.level) {
-            levelStr = "#";
-        } else if ("2" === catalog.level) {
-            levelStr = "##";
-        } else if ("3" === catalog.level) {
-            levelStr = "###";
-        } else if ("4" === catalog.level) {
-            levelStr = "####";
-        } else if ("5" === catalog.level) {
-            levelStr = "#####";
-        }
-        result += levelStr + " " + catalog.name + "\n";
+        result = buildMDTitle(result, catalog);
 
         // 查找笔记
         const note = catalogNameMapNote.get(catalog.name);
+        let highBlockCnt = 0;
+
         if (null != note && null != note.contents && note.contents.length > 0) {
             const contents = note.contents;
             const contentLength = contents.length;
             for (let index = 0; index < contentLength; index++) {
                 const content = contents[index];
-                if (index !== (contentLength - 1)) {
-                    result += content + "\n\n\n";
-                } else {
-                    result += content + "\n";
-                }
+                const finalContent = buildContent(exportNoteType, highBlockCnt, content)
+                result += finalContent
+                ++highBlockCnt;
             }
         }
 
         // 递归处理子级目录
         if (null != catalog.children && catalog.children.length > 0) {
-            result += buildBookNotesTextFun(catalog.children, notes);
+            result += buildBookNotesTextFun(catalog.children, notes, exportNoteType);
         }
     }
     return result;
+}
+
+/**
+ * 构建MD标题和名称
+ * @param result 文本结果
+ * @param catalog 目录
+ * @returns {string} 文本结果
+ */
+function buildMDTitle(result, catalog) {
+    let levelStr = "";
+
+    if ("1" === catalog.level) {
+        levelStr = "#";
+    } else if ("2" === catalog.level) {
+        levelStr = "##";
+    } else if ("3" === catalog.level) {
+        levelStr = "###";
+    } else if ("4" === catalog.level) {
+        levelStr = "####";
+    } else if ("5" === catalog.level) {
+        levelStr = "#####";
+    }
+    result += levelStr + " " + catalog.name + "\n";
+    return result;
+}
+
+function buildContent(exportNoteType, highBlockCnt, content) {
+    if ("yuque".toLowerCase() === exportNoteType.toLowerCase()) {
+        const highBlockIndexMapName = fetchYueQueHighBlockFun();
+        // 高亮块名称
+        const highBlockName = highBlockIndexMapName.get(highBlockCnt % 3);
+        return ":::" + highBlockName + "\n" + content + "\n:::\n";
+    } else if ("markdownQuote".toLowerCase() === exportNoteType.toLowerCase()) {
+        return "> " + content + "\n\n";
+    } else if ("markdownSequence".toLowerCase() === exportNoteType.toLowerCase()) {
+        return "* " + content + "\n\n";
+    } else {
+        return content + "\n\n";
+    }
+}
+
+/**
+ * 获取语雀高亮块名称集合
+ * @returns {Map<any, any>}
+ */
+function fetchYueQueHighBlockFun() {
+    // 定义高亮块，支持 info、tips、warning、danger、success
+    let highBlockIndexMapName = new Map;
+    highBlockIndexMapName.set(0, "info");
+    highBlockIndexMapName.set(1, "tips");
+    highBlockIndexMapName.set(2, "warning");
+    return highBlockIndexMapName;
 }
 
 /**

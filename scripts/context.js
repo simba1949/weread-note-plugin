@@ -4,16 +4,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "fetchBookCatalogFunAction") {
         const result = fetchBookCatalogFun();
         sendResponse(result); // 确保 response 数据被正确返回
-        return true; // 保持异步响应
     } else if (request.action === "fetchBookNoteFunAction") {
         const result = fetchBookNoteFun();
         sendResponse(result); // 确保 response 数据被正确返回
-        return true; // 保持异步响应
     } else if (request.action === "fetchBookNameFunAction") {
         const result = fetchBookNameFun();
         sendResponse(result); // 确保 response 数据被正确返回
-        return true;
     }
+
+    return true; // 保持异步响应
 });
 
 /**
@@ -21,10 +20,18 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
  * @returns 书籍名称
  */
 window.fetchBookNameFun = function fetchBookNameFun() {
-    const title = document.getElementsByClassName("wr_reader_note_panel_header_cell_info_title"); // <div data-v-31681d46 class="wr_reader_note_panel_header_cell_info_title">
-    if (null != title && title.length > 0) {
-        return title[0].textContent;
+    let bookName = "";
+    const titleA = document.getElementsByClassName("wr_reader_note_panel_header_cell_info_title"); // <div data-v-31681d46 class="wr_reader_note_panel_header_cell_info_title">
+    if (null != titleA && titleA.length > 0) {
+        bookName = titleA[0].textContent;
     }
+    if (null == bookName || bookName.trim().length === 0) {
+        const titleB = document.getElementsByClassName("readerCatalog_bookInfo_title_txt");
+        if (null != titleB && titleB.length > 0) {
+            bookName = titleB[0].textContent;
+        }
+    }
+    return bookName;
 }
 
 /**

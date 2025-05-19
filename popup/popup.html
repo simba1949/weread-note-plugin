@@ -55,12 +55,37 @@
             background-color: #1a4074;
             transform: translateY(1px);
         }
+
+        /* 基础高亮样式 */
+        .highlight-select {
+            background-color: #ffdd57; /* 黄色背景 */
+            color: #333;
+            border: 2px solid #ffa726; /* 橙色边框 */
+            font-weight: bold;
+            padding-right: 30px; /* 给图标留点空间 */
+        }
+
+        .highlight-select:hover {
+            background-color: #ffdd57; /* 保持原有黄色背景 */
+            border-color: #ffa726;     /* 边框颜色也保持原色 */
+            box-shadow: none;          /* 去掉阴影 */
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
 <div style="width: 200px">
     <h1>微信读书笔记助手</h1>
     <div class="button-group">
+        <label for="exportFormatSelect" style="display: block; margin-bottom: 8px; text-align: center; font-weight: bold;">
+            选择导出格式：
+            <select id="exportFormatSelect" class="action-btn highlight-select" style="text-align: center;">
+                <option value="yuque" selected>语雀高亮块</option>
+                <option value="markdownQuote">Markdown引用</option>
+                <option value="markdownSequence">Markdown序列</option>
+                <option value="none">无样式</option>
+            </select>
+        </label>
         <button id="fetchBookNameId" class="action-btn">获取当前书名</button>
         <button id="exportBookCatalogId" class="action-btn">导出书籍目录</button>
         <button id="exportBookNotesId" class="action-btn">导出书籍笔记</button>
