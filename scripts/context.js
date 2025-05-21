@@ -17,7 +17,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 /**
  * 获取书籍名称
- * @returns 书籍名称
+ * @returns string 书籍名称
  */
 window.fetchBookNameFun = function fetchBookNameFun() {
     let bookName = "";
@@ -36,7 +36,7 @@ window.fetchBookNameFun = function fetchBookNameFun() {
 
 /**
  * 获取书籍目录
- * @returns 返回集合 [{'name':'','level':'','children':['']}]
+ * @returns *[] 返回集合 [{'name':'','level':'','children':['']}]
  */
 window.fetchBookCatalogFun = function fetchBookCatalogFun() {
     // 定义 Catalog 构造函数
@@ -127,7 +127,7 @@ window.fetchBookCatalogFun = function fetchBookCatalogFun() {
 
 /**
  * 获取书籍笔记
- * @returns 返回集合 [{'catalogName':'', 'contents':['']}]
+ * @returns *[] 返回集合 [{'catalogName':'', 'contents':['']}]
  */
 window.fetchBookNoteFun = function fetchBookNoteFun() {
     // 定义 Note 构造函数
