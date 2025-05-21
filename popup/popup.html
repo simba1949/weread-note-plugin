@@ -3,75 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>微信读书笔记助手</title>
-    <style>
-        /* 基础样式 */
-        body {
-            margin: 0;
-            padding: 20px;
-            font-family: 'Arial', sans-serif;
-            background-color: #f5f5f5;
-            color: #333;
-            max-width: 300px;
-            min-height: 200px;
-        }
-
-        /* 标题样式 */
-        h1 {
-            text-align: center;
-            color: #2B5797;
-            font-size: 24px;
-            margin-bottom: 30px;
-            font-weight: 500;
-        }
-
-        /* 按钮容器 */
-        .button-group {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        /* 按钮通用样式 */
-        .action-btn {
-            background-color: #2B5797;
-            color: white;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: all 0.2s ease;
-            width: 100%;
-        }
-
-        /* 按钮悬停效果 */
-        .action-btn:hover {
-            background-color: #1a4074;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        /* 按钮点击状态 */
-        .action-btn:active {
-            background-color: #1a4074;
-            transform: translateY(1px);
-        }
-
-        /* 基础高亮样式 */
-        .highlight-select {
-            background-color: #ffdd57; /* 黄色背景 */
-            color: #333;
-            border: 2px solid #ffa726; /* 橙色边框 */
-            font-weight: bold;
-            padding-right: 30px; /* 给图标留点空间 */
-        }
-
-        .highlight-select:hover {
-            background-color: #ffdd57; /* 保持原有黄色背景 */
-            border-color: #ffa726;     /* 边框颜色也保持原色 */
-            box-shadow: none;          /* 去掉阴影 */
-            cursor: pointer;
-        }
-    </style>
+    <!-- html 引入 .css 文件 -->
+    <link rel="stylesheet" href="popup.css">
 </head>
 <body>
 <div style="width: 200px">
@@ -92,5 +25,6 @@
     </div>
 </div>
 </body>
+<!-- html 引入 .js 文件 -->
 <script src="popup.js"></script>
 </html>
