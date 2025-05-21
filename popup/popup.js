@@ -250,7 +250,7 @@ function buildContent(exportNoteType, highBlockCnt, content) {
     if ("yuque".toLowerCase() === exportNoteType.toLowerCase()) {
         const highBlockIndexMapName = fetchYueQueHighBlockFun();
         // 高亮块名称
-        const highBlockName = highBlockIndexMapName.get(highBlockCnt % 3);
+        const highBlockName = highBlockIndexMapName.get(highBlockCnt % 2);
         return ":::" + highBlockName + "\n" + content + "\n:::\n";
     } else if ("markdownQuote".toLowerCase() === exportNoteType.toLowerCase()) {
         return "> " + content + "\n\n";
@@ -270,7 +270,6 @@ function fetchYueQueHighBlockFun() {
     let highBlockIndexMapName = new Map;
     highBlockIndexMapName.set(0, "info");
     highBlockIndexMapName.set(1, "tips");
-    highBlockIndexMapName.set(2, "warning");
     return highBlockIndexMapName;
 }
 
