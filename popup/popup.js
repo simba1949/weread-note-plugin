@@ -299,7 +299,7 @@ function buildContent(exportNoteType, highBlockCnt, content) {
  */
 function specialSequenceSymbolReplaceAll(content) {
     // 特殊序列符号
-    const specialSequenceSymbols = ["●", "● "]
+    const specialSequenceSymbols = ["●", "● ", "·", "· "]
     for (let specialSequenceSymbol of specialSequenceSymbols) {
         if (content.indexOf(specialSequenceSymbol) > -1) {
             content = content.replaceAll(specialSequenceSymbol, "\n* ")
