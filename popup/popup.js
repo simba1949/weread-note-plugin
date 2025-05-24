@@ -218,7 +218,7 @@ function buildBookNotesTextFun(catalogs, notes, exportNoteType) {
 
     let result = "";
     for (const catalog of catalogs) {
-        result = buildMDTitle(result, catalog);
+        result = buildMarkDownTitle(result, catalog);
 
         // 查找笔记
         const note = catalogNameMapNote.get(catalog.name);
@@ -244,12 +244,12 @@ function buildBookNotesTextFun(catalogs, notes, exportNoteType) {
 }
 
 /**
- * 构建MD标题和名称
+ * 构建 markdown 标题和名称
  * @param result 文本结果
  * @param catalog 目录
  * @returns {string} 文本结果
  */
-function buildMDTitle(result, catalog) {
+function buildMarkDownTitle(result, catalog) {
     let levelStr = "";
 
     if ("1" === catalog.level) {
@@ -280,12 +280,16 @@ function buildContent(exportNoteType, highBlockCnt, content) {
         const highBlockIndexMapName = fetchYueQueHighBlockFun();
         // 高亮块名称
         const highBlockName = highBlockIndexMapName.get(highBlockCnt % 2);
+        // 组建高亮块
         finalContent = ":::" + highBlockName + "\n" + content + "\n:::\n";
     } else if ("markdownQuote".toLowerCase() === exportNoteType.toLowerCase()) {
+        // 引用块
         finalContent = "> " + content + "\n\n";
     } else if ("markdownSequence".toLowerCase() === exportNoteType.toLowerCase()) {
+        // 无序序列
         finalContent = "* " + content + "\n\n";
     } else {
+        // 纯文本
         finalContent = content + "\n\n";
     }
 
@@ -298,22 +302,72 @@ function buildContent(exportNoteType, highBlockCnt, content) {
  * @returns {*}
  */
 function specialSequenceSymbolReplaceAll(content) {
-    // 无序列表：前一个字符是结束语 + 特殊序列符号
+    // 列表：前一个字符是结束语 + 特殊序列符号
     // 特殊序列前一个的字符集合
-    const symbols = ["。", "：", "？", "；", "\n"];
+    const sequencePreChars = ["。", "：", "？", "；", "\n", "？"];
 
-    // 特殊序列符号
-    const specialSequenceSymbols = ["●", "● ", "·", "· "]
-
-    for (let specialSequenceSymbol of specialSequenceSymbols) {
-        const indexOfSpecialSequenceSymbol = content.indexOf(specialSequenceSymbol);
-        const symbolPreChar = content.charAt(indexOfSpecialSequenceSymbol - 1);
-        if (indexOfSpecialSequenceSymbol > -1 && symbols.includes(symbolPreChar)) {
-            content = content.replaceAll(specialSequenceSymbol, "\n* ")
+    // 无序序列符号
+    // 半角的【·】不能添加，防止英文名或者英译中的名字出现无序符号
+    const setSymbols = ["●", "● ", "· "]
+    for (let setSymbol of setSymbols) {
+        if (content.indexOf(setSymbol) > -1){
+            content = content.replaceAll(setSymbol, "\n* ")
         }
     }
+
+    // 顺序序列
+    const listPreChars = ["．", "."]
+    for (let listPreChar of listPreChars) {
+        for (let i = 0; i < 10; i++) {
+            const listSymbol = i + listPreChar;
+            if (content.indexOf(listSymbol) > -1) {
+                content = content.replaceAll(listSymbol, "\n" + i + ". ");
+            }
+        }
+    }
+
+
+    // 特殊顺序序列
+    // 有序序列中带有有序序列不好判断
+    // const specialDoubleListSymbols = specialDoubleListSymbolFun();
+    // for (let i = 0; i < 10; i++) {
+    //     for (let specialDoubleListSymbol of specialDoubleListSymbols) {
+    //         let specialSymbol = specialDoubleListSymbol.left + i + specialDoubleListSymbol.right;
+    //         const indexOfSpecialListSymbol = content.indexOf(specialSymbol);
+    //         const symbolPreChar = content.charAt(indexOfSpecialListSymbol - 1);
+    //         if (indexOfSpecialListSymbol > -1 && sequencePreChars.includes(symbolPreChar)) {
+    //             content = content.replaceAll(specialSymbol, "\n" + i + ". ")
+    //         }
+    //     }
+    // }
+
     return content;
 }
+
+class SpecialDoubleListSymbol {
+    constructor(left, right) {
+        this.left = left;
+        this.right = right;
+    }
+}
+
+/**
+ * 获取特殊序列符号
+ * @returns {*[]}
+ */
+function specialDoubleListSymbolFun() {
+    let result = [];
+
+    const symbol1 = new SpecialDoubleListSymbol("（", "）");
+    result.push(symbol1);
+    const symbol2 = new SpecialDoubleListSymbol("【", "】");
+    result.push(symbol2);
+    const symbol3 = new SpecialDoubleListSymbol("(", ")");
+    result.push(symbol3);
+
+    return result;
+}
+
 
 /**
  * 获取语雀高亮块名称集合
