@@ -298,10 +298,17 @@ function buildContent(exportNoteType, highBlockCnt, content) {
  * @returns {*}
  */
 function specialSequenceSymbolReplaceAll(content) {
+    // 无序列表：前一个字符是结束语 + 特殊序列符号
+    // 特殊序列前一个的字符集合
+    const symbols = ["。", "：", "？", "；", "\n"];
+
     // 特殊序列符号
     const specialSequenceSymbols = ["●", "● ", "·", "· "]
+
     for (let specialSequenceSymbol of specialSequenceSymbols) {
-        if (content.indexOf(specialSequenceSymbol) > -1) {
+        const indexOfSpecialSequenceSymbol = content.indexOf(specialSequenceSymbol);
+        const symbolPreChar = content.charAt(indexOfSpecialSequenceSymbol - 1);
+        if (indexOfSpecialSequenceSymbol > -1 && symbols.includes(symbolPreChar)) {
             content = content.replaceAll(specialSequenceSymbol, "\n* ")
         }
     }
